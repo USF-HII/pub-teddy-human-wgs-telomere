@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+export BASE=$(readlink -f $(dirname $0)/..)
+
+export RUN=${RUN:-test}
+
+export RUN_BASE=${BASE}/run/${RUN}
+export LOGS=${RUN_BASE}/logs
+export WORK=${RUN_BASE}/work
+
+[[ -d ${WORK} ]] || /bin/mkdir -p ${WORK}
+[[ -d ${LOGS} ]] || /bin/mkdir -p ${LOGS}
+
+SNAKEFILE=${SNAKEFILE:-${BASE}/Snakefile}
+
+SNAKEMAKE=${SNAKEMAKE:-/shares/hii/sw/snakemake/latest/bin/snakemake}
+SNAKEMAKE_PYTHON=$(dirname ${SNAKEMAKE})/python
+
+MAXJOBS=${MAXJOBS:-1000}
+
+echo 1>&2
+echo "Snakemake version: $(${SNAKEMAKE} --version)" 1>&2
+echo 1>&2
+
+set -x
+
+${SNAKEMAKE} \
+  ${opts} \
+  --cluster-config=${BASE}/cluster.yaml \
+  --cluster="${SNAKEMAKE_PYTHON} ${BASE}/bin/cluster-slurm" \
+  --jobs=${MAXJOBS} \
+  --snakefile=${SNAKEFILE} \
+  --directory=${WORK} \
+  "$@"

@@ -1,0 +1,6 @@
+[FORMAT]
+  good-names = d, f, f_in, f_out, fi, fo
+  max-line-length = 132
+
+[MESSAGES CONTROL]
+  disable = C0103, C0111

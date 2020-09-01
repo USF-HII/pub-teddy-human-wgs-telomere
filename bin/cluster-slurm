@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+
+from snakemake.utils import read_job_properties
+
+RUN = os.environ.get('RUN', 'main')
+
+jobscript = sys.argv[1]
+
+p = read_job_properties(jobscript)
+
+cpus = p['params'].get('cpus', p['cluster']['cpus'])
+partition = os.environ.get('SBATCH_PARTITION', p['params'].get('partition', p['cluster']['partition']))
+mem = p['params'].get('mem', p['cluster']['mem'])
+time = p['params'].get('time', p['cluster']['time'])
+log = p['params'].get('log', p['cluster']['log'])
+sbatch_args = os.environ.get('SBATCH_ARGS', p['params'].get('sbatch_args', p['cluster']['sbatch_args']))
+
+job_name =  RUN + '-' + p['params'].get('job_name', (p['rule']+'-'+str(p['jobid'])))
+
+log = os.path.join(os.environ.get('LOGS', f'logs/{RUN}'), log)
+
+if not os.path.exists(os.path.dirname(log)):
+    os.makedirs(os.path.dirname(log))
+
+if cpus == 'all':
+    cpus_arg = '--exclusive'
+else:
+    cpus_arg = f'--cpus-per-task={cpus}'
+
+command = f'sbatch --partition={partition} --job-name={job_name} --time={time} --mem={mem} {cpus_arg} --output={log} {sbatch_args} {jobscript}'
+
+
+os.system(command)
+
+#------------------------------------------------------------------------------------------------------
+# properties = {
+#    "rule": "fastqc",
+#    "local": false,
+#    "input": ["/shares/hii/bioinfo/data/test/human-wgs-mini/TST01_R1.fastq.gz",
+#              "/shares/hii/bioinfo/data/test/human-wgs-mini/TST01_R2.fastq.gz"],
+#    "output": ["tmp/work/sample/TST01/TST01_R1_fastqc.html",
+#               "tmp/work/sample/TST01/TST01_R2_fastqc.html"],
+#    "wildcards": ["TST01"],
+#    "params": {"output_dir": "tmp/work/sample/TST01"},
+#    "log": [],
+#    "threads": 1,
+#    "resources": {},
+#    "jobid": 3,
+#    "cluster": {
+#      "cpus_per_task": "5", "mem": "50G", "time": "1-0", "ntasks": "1",
+#      "partition": "hii02", "output": "tmp/logs/TST01-fastqc.log"
+#    }
+# }
+#------------------------------------------------------------------------------------------------------

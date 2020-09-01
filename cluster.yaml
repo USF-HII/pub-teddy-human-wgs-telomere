@@ -1,0 +1,7 @@
+__default__:
+  cpus: '2'
+  mem: '20G'
+  time: '0-4'
+  partition: 'hii02'
+  log: '{rule}/%j.log'
+  sbatch_args: ''
