@@ -1,5 +1,7 @@
 # pub-teddy-human-wgs-telomere
 
+### It allows estimating the telomere length from the TEDDY whole-genome sequencing (WGS) data using five different tools: Computel, Telseq, Telomerecat, qMotif and Motif_counter.
+
 This repository uses:
 - Docker <https://www.docker.com/> to build a container with all the necessary software
 - Singularity <https://sylabs.io/docs/> to execute the container in a High Performance Computing environment
